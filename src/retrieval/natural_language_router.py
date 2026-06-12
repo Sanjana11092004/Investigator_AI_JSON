@@ -20,6 +20,10 @@ class NaturalLanguageRouter:
             q
         )
 
+        # -------------------------
+        # SUBJECT-SPECIFIC QUERIES
+        # -------------------------
+
         if subject_match:
 
             subject_id = (
@@ -50,11 +54,9 @@ class NaturalLanguageRouter:
                 )
 
             if (
-                "adverse"
-                in q
+                "adverse" in q
                 or
-                "ae"
-                in q
+                "ae" in q
             ):
 
                 return (
@@ -67,6 +69,10 @@ class NaturalLanguageRouter:
                 subject_id
             )
 
+        # -------------------------
+        # STUDY QUERIES
+        # -------------------------
+
         if study_match:
 
             return (
@@ -75,6 +81,47 @@ class NaturalLanguageRouter:
                 .group()
                 .upper()
             )
+
+        # -------------------------
+        # SESSION-AWARE SUBJECT QUERIES
+        # (No SUBJID provided)
+        # -------------------------
+
+        if "demographic" in q:
+
+            return (
+                "subject_demographics",
+                None
+            )
+
+        if "medication" in q:
+
+            return (
+                "subject_medications",
+                None
+            )
+
+        if "lab" in q:
+
+            return (
+                "subject_labs",
+                None
+            )
+
+        if (
+            "adverse" in q
+            or
+            "ae" in q
+        ):
+
+            return (
+                "subject_ae",
+                None
+            )
+
+        # -------------------------
+        # AGGREGATION QUERIES
+        # -------------------------
 
         if (
             "average age"

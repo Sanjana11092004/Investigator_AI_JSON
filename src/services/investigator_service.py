@@ -51,6 +51,36 @@ class InvestigatorService:
             )
         )
 
+        session = self.sessions.get(
+            session_id
+        )
+
+        if (
+            value is None
+            and
+            session
+        ):
+
+            active_subject = (
+                session.get(
+                    "active_subject_id"
+                )
+            )
+
+            if active_subject:
+
+                if intent in [
+
+                    "subject_demographics",
+                    "subject_medications",
+                    "subject_labs",
+                    "subject_ae",
+                    "subject_all"
+
+                ]:
+
+                    value = active_subject
+
         if value and value.startswith(
             "SUBJ-"
         ):
