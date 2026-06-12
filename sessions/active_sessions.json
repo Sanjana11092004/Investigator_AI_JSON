@@ -4,5 +4,11 @@
     "active_patient_id": null,
     "active_study_id": "NCT05575635",
     "last_query": "Show demographics"
+  },
+  "default": {
+    "active_subject_id": "SUBJ-0001",
+    "active_patient_id": null,
+    "active_study_id": null,
+    "last_query": null
   }
 }
