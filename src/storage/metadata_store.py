@@ -32,6 +32,8 @@ class MetadataStore:
 
                 json_path TEXT,
 
+                file_hash TEXT,
+
                 created_at TEXT
 
             )
@@ -47,7 +49,8 @@ class MetadataStore:
         category: str,
         source_file: str,
         source_type: str,
-        json_path: str
+        json_path: str,
+        file_hash: str
     ):
 
         conn = sqlite3.connect(self.db_path)
@@ -57,7 +60,7 @@ class MetadataStore:
         cursor.execute(
             """
             INSERT INTO documents
-            VALUES (?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 document_id,
@@ -65,9 +68,34 @@ class MetadataStore:
                 source_file,
                 source_type,
                 json_path,
+                file_hash,
                 datetime.utcnow().isoformat()
             )
         )
 
         conn.commit()
         conn.close()
+
+    def file_exists(
+        self,
+        file_hash: str
+    ) -> bool:
+
+        conn = sqlite3.connect(self.db_path)
+
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            SELECT COUNT(*)
+            FROM documents
+            WHERE file_hash = ?
+            """,
+            (file_hash,)
+        )
+
+        exists = cursor.fetchone()[0] > 0
+
+        conn.close()
+
+        return exists
