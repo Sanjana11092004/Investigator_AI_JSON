@@ -23,9 +23,14 @@ class JSONStore:
             exist_ok=True
         )
 
+        file_name = (
+            document.file_name
+            or document.document_id
+        )
+
         file_path = (
             category_dir
-            / f"{document.document_id}.json"
+            / f"{file_name}.json"
         )
 
         with open(file_path, "wb") as f:

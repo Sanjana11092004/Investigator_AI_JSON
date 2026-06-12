@@ -13,6 +13,8 @@ class ClinicalDocument(BaseModel):
         default_factory=lambda: str(uuid4())
     )
 
+    file_name: str | None = None
+    
     version: int = 1
 
     source_file: str

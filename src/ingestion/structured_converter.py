@@ -113,7 +113,18 @@ class StructuredConverter:
                     ]
                 )
 
+            study_id = metadata.get(
+                "study_id",
+                "UNKNOWN"
+            )
+
+            domain = metadata.get(
+                "domain",
+                category.upper()
+            )
+
             document = ClinicalDocument(
+                file_name=f"{study_id}_{domain}",
                 source_file=Path(
                     file_path
                 ).name,
@@ -192,6 +203,7 @@ class StructuredConverter:
         )
 
         document = ClinicalDocument(
+            file_name=study_id,
             source_file=Path(
                 file_path
             ).name,
