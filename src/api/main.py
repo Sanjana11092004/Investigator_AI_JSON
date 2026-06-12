@@ -16,6 +16,10 @@ from src.api.routes.upload_routes import (
     router as upload_router
 )
 
+from src.api.routes.investigator_routes import (
+    router as investigator_router
+)
+
 app = FastAPI(
 
     title="Investigator AI",
@@ -57,6 +61,12 @@ app.include_router(
     prefix="/upload",
 
     tags=["Upload"]
+)
+
+app.include_router(
+    investigator_router,
+    prefix="/investigator",
+    tags=["Investigator"]
 )
 
 

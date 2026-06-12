@@ -63,3 +63,30 @@ class GroqService:
                 "error": str(e),
                 "raw_response": content
             }
+
+    def generate(
+        self,
+        prompt: str
+    ) -> str:
+
+        response = (
+            self.client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                temperature=0.2,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ]
+            )
+        )
+
+        return (
+
+            response
+            .choices[0]
+            .message
+            .content
+
+        )

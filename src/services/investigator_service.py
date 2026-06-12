@@ -14,6 +14,10 @@ from src.session.session_manager import (
     SessionManager
 )
 
+from src.services.response_formatter import (
+    ResponseFormatter
+)
+
 
 class InvestigatorService:
 
@@ -33,6 +37,10 @@ class InvestigatorService:
 
         self.sessions = (
             SessionManager()
+        )
+
+        self.formatter = (
+            ResponseFormatter()
         )
 
     def ask(
@@ -101,7 +109,7 @@ class InvestigatorService:
 
         if intent == "subject_demographics":
 
-            return (
+            records = (
                 self.engine
                 .get_subject_data(
                     value
@@ -111,9 +119,16 @@ class InvestigatorService:
                 )
             )
 
+            return (
+                self.formatter
+                .format_demographics(
+                    records
+                )
+            )
+
         if intent == "subject_medications":
 
-            return (
+            records = (
                 self.engine
                 .get_subject_data(
                     value
@@ -123,9 +138,16 @@ class InvestigatorService:
                 )
             )
 
+            return (
+                self.formatter
+                .format_medications(
+                    records
+                )
+            )
+
         if intent == "subject_labs":
 
-            return (
+            records = (
                 self.engine
                 .get_subject_data(
                     value
@@ -135,15 +157,29 @@ class InvestigatorService:
                 )
             )
 
+            return (
+                self.formatter
+                .format_labs(
+                    records
+                )
+            )
+
         if intent == "subject_ae":
 
-            return (
+            records = (
                 self.engine
                 .get_subject_data(
                     value
                 )
                 .get(
                     "adverse_events"
+                )
+            )
+
+            return (
+                self.formatter
+                .format_adverse_events(
+                    records
                 )
             )
 
