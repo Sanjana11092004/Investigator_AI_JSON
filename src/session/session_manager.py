@@ -27,6 +27,13 @@ class SessionManager:
                 "active_subject_id": None,
                 "active_patient_id": None,
                 "active_study_id": None,
+
+                # NEW
+                "active_cohort": [],
+
+                # NEW
+                "active_domain": None,
+
                 "last_query": None
             }
 
@@ -95,6 +102,32 @@ class SessionManager:
             session_id,
             "active_study_id",
             study_id
+        )
+
+    # NEW
+    def set_active_cohort(
+        self,
+        session_id: str,
+        cohort: list
+    ):
+
+        self._update(
+            session_id,
+            "active_cohort",
+            cohort
+        )
+
+    # NEW
+    def set_active_domain(
+        self,
+        session_id: str,
+        domain: str
+    ):
+
+        self._update(
+            session_id,
+            "active_domain",
+            domain
         )
 
     def set_last_query(

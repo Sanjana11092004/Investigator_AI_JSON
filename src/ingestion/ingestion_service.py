@@ -1,13 +1,25 @@
 from pathlib import Path
 
-from loguru import logger
+from src.ingestion.structured_converter import (
+    StructuredConverter
+)
 
-from src.ingestion.file_normalizer import (
-    FileNormalizer
+from src.ingestion.pdf_processor import (
+    PDFProcessor
 )
 
 
 class IngestionService:
+
+    def __init__(self):
+
+        self.converter = (
+            StructuredConverter()
+        )
+
+        self.pdf_processor = (
+            PDFProcessor()
+        )
 
     def process_file(
         self,
@@ -16,19 +28,68 @@ class IngestionService:
 
         path = Path(file_path)
 
-        file_type = (
-            FileNormalizer.get_file_type(path)
+        suffix = (
+            path.suffix.lower()
         )
 
-        logger.info(
-            f"Processing {path.name}"
-        )
+        # -------------------------
+        # EXCEL
+        # -------------------------
 
-        logger.info(
-            f"Detected type: {file_type}"
-        )
+        if suffix in [
 
-        return {
-            "file_name": path.name,
-            "file_type": file_type
-        }
+            ".xlsx",
+            ".xls"
+
+        ]:
+
+            return (
+
+                self.converter
+                .process_excel(
+                    file_path
+                )
+
+            )
+
+        # -------------------------
+        # STUDY JSON
+        # -------------------------
+
+        if suffix == ".json":
+
+            return (
+
+                self.converter
+                .process_study_json(
+                    file_path
+                )
+
+            )
+
+        # -------------------------
+        # PDF
+        # -------------------------
+
+        if suffix == ".pdf":
+
+            text = (
+
+                self.pdf_processor
+                .extract_text(
+                    file_path
+                )
+
+            )
+
+            return {
+
+                "file_type": "pdf",
+                "characters": len(text),
+                "preview": text[:500]
+
+            }
+
+        raise ValueError(
+            f"Unsupported file type: {suffix}"
+        )

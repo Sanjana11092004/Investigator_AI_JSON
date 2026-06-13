@@ -21,7 +21,7 @@ class NaturalLanguageRouter:
         )
 
         # -------------------------
-        # SUBJECT-SPECIFIC QUERIES
+        # SUBJECT QUERIES
         # -------------------------
 
         if subject_match:
@@ -83,8 +83,68 @@ class NaturalLanguageRouter:
             )
 
         # -------------------------
-        # SESSION-AWARE SUBJECT QUERIES
-        # (No SUBJID provided)
+        # COHORT QUERIES
+        # -------------------------
+
+        if "copd" in q:
+
+            return (
+                "cohort_diagnosis",
+                "COPD"
+            )
+
+        if "hypertension" in q:
+
+            return (
+                "cohort_diagnosis",
+                "Hypertension"
+            )
+
+        if "diabetes" in q:
+
+            return (
+                "cohort_diagnosis",
+                "Type 2 Diabetes"
+            )
+
+        if (
+            "female" in q
+            or
+            "females" in q
+        ):
+
+            return (
+                "cohort_female",
+                None
+            )
+
+        if (
+            "male" in q
+            or
+            "males" in q
+        ):
+
+            return (
+                "cohort_male",
+                None
+            )
+
+        age_match = re.search(
+            r"age\s*>\s*(\d+)",
+            q
+        )
+
+        if age_match:
+
+            return (
+                "cohort_age_gt",
+                int(
+                    age_match.group(1)
+                )
+            )
+
+        # -------------------------
+        # SESSION SUBJECT QUERIES
         # -------------------------
 
         if "demographic" in q:
@@ -120,33 +180,24 @@ class NaturalLanguageRouter:
             )
 
         # -------------------------
-        # AGGREGATION QUERIES
+        # AGGREGATIONS
         # -------------------------
 
-        if (
-            "average age"
-            in q
-        ):
+        if "average age" in q:
 
             return (
                 "average_age",
                 None
             )
 
-        if (
-            "top diagnoses"
-            in q
-        ):
+        if "top diagnoses" in q:
 
             return (
                 "top_diagnoses",
                 None
             )
 
-        if (
-            "top medications"
-            in q
-        ):
+        if "top medications" in q:
 
             return (
                 "top_medications",

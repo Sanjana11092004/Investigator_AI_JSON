@@ -3,18 +3,19 @@
     "active_subject_id": "SUBJ-0001",
     "active_patient_id": null,
     "active_study_id": "NCT05575635",
+    "active_cohort": [],
+    "active_domain": null,
     "last_query": "Show demographics"
   },
   "default": {
-    "active_subject_id": "SUBJ-0001",
+    "active_subject_id": null,
     "active_patient_id": null,
     "active_study_id": null,
-    "last_query": null
-  },
-  "demo_session": {
-    "active_subject_id": "SUBJ-0001",
-    "active_patient_id": null,
-    "active_study_id": null,
+    "active_cohort": [
+      "SUBJ-0020",
+      "SUBJ-0030"
+    ],
+    "active_domain": null,
     "last_query": null
   }
 }

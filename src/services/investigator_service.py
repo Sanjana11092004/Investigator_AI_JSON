@@ -10,6 +10,10 @@ from src.retrieval.aggregations import (
     Aggregations
 )
 
+from src.retrieval.cohort_service import (
+    CohortService
+)
+
 from src.session.session_manager import (
     SessionManager
 )
@@ -33,6 +37,10 @@ class InvestigatorService:
 
         self.agg = (
             Aggregations()
+        )
+
+        self.cohort = (
+            CohortService()
         )
 
         self.sessions = (
@@ -59,9 +67,15 @@ class InvestigatorService:
             )
         )
 
-        session = self.sessions.get(
-            session_id
+        session = (
+            self.sessions.get(
+                session_id
+            )
         )
+
+        # -------------------------
+        # SESSION SUBJECT MEMORY
+        # -------------------------
 
         if (
             value is None
@@ -89,14 +103,147 @@ class InvestigatorService:
 
                     value = active_subject
 
-        if value and value.startswith(
-            "SUBJ-"
+        # -------------------------
+        # STORE ACTIVE SUBJECT
+        # -------------------------
+
+        if (
+            isinstance(
+                value,
+                str
+            )
+            and
+            value.startswith(
+                "SUBJ-"
+            )
         ):
 
             self.sessions.set_active_subject(
                 session_id,
                 value
             )
+
+        # -------------------------
+        # COHORT QUERIES
+        # -------------------------
+
+        if intent == "cohort_diagnosis":
+
+            cohort = (
+                self.cohort
+                .diagnosis(
+                    value
+                )
+            )
+
+            self.sessions.set_active_cohort(
+                session_id,
+                cohort
+            )
+
+            return {
+
+                "cohort_size":
+                len(cohort),
+
+                "subjects":
+                cohort
+            }
+
+        if intent == "cohort_female":
+
+            current = (
+                session.get(
+                    "active_cohort",
+                    []
+                )
+            )
+
+            result = (
+                self.cohort.sex(
+                    current,
+                    "F"
+                )
+            )
+
+            self.sessions.set_active_cohort(
+                session_id,
+                result
+            )
+
+            return {
+
+                "cohort_size":
+                len(result),
+
+                "subjects":
+                result
+            }
+
+        if intent == "cohort_male":
+
+            current = (
+                session.get(
+                    "active_cohort",
+                    []
+                )
+            )
+
+            result = (
+                self.cohort.sex(
+                    current,
+                    "M"
+                )
+            )
+
+            self.sessions.set_active_cohort(
+                session_id,
+                result
+            )
+
+            return {
+
+                "cohort_size":
+                len(result),
+
+                "subjects":
+                result
+            }
+
+        if intent == "cohort_age_gt":
+
+            current = (
+                session.get(
+                    "active_cohort",
+                    []
+                )
+            )
+
+            result = (
+                self.cohort
+                .age_greater_than(
+                    current,
+                    value
+                )
+            )
+
+            self.sessions.set_active_cohort(
+                session_id,
+                result
+            )
+
+            return {
+
+                "cohort_size":
+                len(result),
+
+                "subjects":
+                result
+            }
+
+        # -------------------------
+        # SUBJECT QUERIES
+        # -------------------------
 
         if intent == "subject_all":
 
@@ -183,6 +330,10 @@ class InvestigatorService:
                 )
             )
 
+        # -------------------------
+        # STUDY
+        # -------------------------
+
         if intent == "study":
 
             return (
@@ -192,39 +343,33 @@ class InvestigatorService:
                 )
             )
 
+        # -------------------------
+        # AGGREGATIONS
+        # -------------------------
+
         if intent == "average_age":
 
             return {
-
                 "average_age":
-
                 self.agg.average_age()
-
             }
 
         if intent == "top_diagnoses":
 
             return {
-
                 "top_diagnoses":
-
                 self.agg.top_diagnoses()
-
             }
 
         if intent == "top_medications":
 
             return {
-
                 "top_medications":
-
                 self.agg.top_medications()
-
             }
 
         return {
 
             "message":
-
             "Unable to determine intent"
         }
