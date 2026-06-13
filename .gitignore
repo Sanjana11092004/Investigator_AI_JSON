@@ -22,4 +22,4 @@ json_store/*
 incoming/*
 !incoming/.gitkeep
 
-logs/
+logs/uploads/
