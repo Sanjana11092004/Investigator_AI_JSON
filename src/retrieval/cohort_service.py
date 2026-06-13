@@ -1,25 +1,14 @@
-import json
-from pathlib import Path
+from src.retrieval.json_query_engine import (
+    JSONQueryEngine
+)
 
 
 class CohortService:
 
     def __init__(self):
 
-        self.dm_file = Path(
-            "json_store/demographics/PHVIGIL2024_DM.json"
-        )
-
-        with open(
-            self.dm_file,
-            "r",
-            encoding="utf-8"
-        ) as f:
-
-            payload = json.load(f)
-
-        self.records = (
-            payload["data"]["records"]
+        self.engine = (
+            JSONQueryEngine()
         )
 
     def diagnosis(
@@ -27,25 +16,14 @@ class CohortService:
         diagnosis: str
     ):
 
-        diagnosis = (
-            diagnosis.lower()
+        return (
+
+            self.engine
+            .find_by_diagnosis(
+                diagnosis
+            )
+
         )
-
-        return [
-
-            r["SUBJID"]
-
-            for r in self.records
-
-            if diagnosis
-            in str(
-                r.get(
-                    "DIAGNOSIS",
-                    ""
-                )
-            ).lower()
-
-        ]
 
     def sex(
         self,
@@ -55,22 +33,44 @@ class CohortService:
 
         sex = sex.upper()
 
-        return [
+        results = []
 
-            r["SUBJID"]
+        for subject_id in subjects:
 
-            for r in self.records
-
-            if (
-                r["SUBJID"]
-                in subjects
-                and
-                r.get(
-                    "SEX"
-                ) == sex
+            data = (
+                self.engine
+                .get_subject_data(
+                    subject_id
+                )
             )
 
-        ]
+            if not data:
+                continue
+
+            demographics = (
+                data.get(
+                    "demographics",
+                    []
+                )
+            )
+
+            for record in demographics:
+
+                if (
+                    record.get(
+                        "SEX"
+                    )
+                    ==
+                    sex
+                ):
+
+                    results.append(
+                        subject_id
+                    )
+
+                    break
+
+        return results
 
     def age_greater_than(
         self,
@@ -78,20 +78,42 @@ class CohortService:
         age: int
     ):
 
-        return [
+        results = []
 
-            r["SUBJID"]
+        for subject_id in subjects:
 
-            for r in self.records
-
-            if (
-                r["SUBJID"]
-                in subjects
-                and
-                r.get(
-                    "AGE",
-                    0
-                ) > age
+            data = (
+                self.engine
+                .get_subject_data(
+                    subject_id
+                )
             )
 
-        ]
+            if not data:
+                continue
+
+            demographics = (
+                data.get(
+                    "demographics",
+                    []
+                )
+            )
+
+            for record in demographics:
+
+                if (
+                    record.get(
+                        "AGE",
+                        0
+                    )
+                    >
+                    age
+                ):
+
+                    results.append(
+                        subject_id
+                    )
+
+                    break
+
+        return results

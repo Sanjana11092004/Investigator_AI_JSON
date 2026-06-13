@@ -11,3 +11,10 @@ class QueryRequest(BaseModel):
 class SessionRequest(BaseModel):
 
     session_id: str
+
+
+class ChatRequest(BaseModel):
+
+    session_id: str
+
+    question: str
