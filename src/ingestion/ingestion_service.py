@@ -4,8 +4,8 @@ from src.ingestion.structured_converter import (
     StructuredConverter
 )
 
-from src.ingestion.pdf_processor import (
-    PDFProcessor
+from src.ingestion.pdf_converter import (
+    PDFConverter
 )
 
 
@@ -17,8 +17,8 @@ class IngestionService:
             StructuredConverter()
         )
 
-        self.pdf_processor = (
-            PDFProcessor()
+        self.pdf_converter = (
+            PDFConverter()
         )
 
     def process_file(
@@ -26,15 +26,13 @@ class IngestionService:
         file_path: str
     ):
 
-        path = Path(file_path)
+        path = Path(
+            file_path
+        )
 
         suffix = (
             path.suffix.lower()
         )
-
-        # -------------------------
-        # EXCEL
-        # -------------------------
 
         if suffix in [
 
@@ -44,51 +42,29 @@ class IngestionService:
         ]:
 
             return (
-
                 self.converter
                 .process_excel(
                     file_path
                 )
-
             )
-
-        # -------------------------
-        # STUDY JSON
-        # -------------------------
 
         if suffix == ".json":
 
             return (
-
                 self.converter
                 .process_study_json(
                     file_path
                 )
-
             )
-
-        # -------------------------
-        # PDF
-        # -------------------------
 
         if suffix == ".pdf":
 
-            text = (
-
-                self.pdf_processor
-                .extract_text(
+            return (
+                self.pdf_converter
+                .process_pdf(
                     file_path
                 )
-
             )
-
-            return {
-
-                "file_type": "pdf",
-                "characters": len(text),
-                "preview": text[:500]
-
-            }
 
         raise ValueError(
             f"Unsupported file type: {suffix}"
