@@ -205,6 +205,6 @@ class NaturalLanguageRouter:
             )
 
         return (
-            "unknown",
+            "out_of_scope",
             None
         )

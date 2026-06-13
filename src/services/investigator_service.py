@@ -367,9 +367,25 @@ class InvestigatorService:
                 "top_medications":
                 self.agg.top_medications()
             }
+        
+        if intent == "out_of_scope":
 
-        return {
+            return {
 
-            "message":
-            "Unable to determine intent"
-        }
+                "message":
+
+                (
+                    "This system supports clinical trial "
+                    "investigations only. "
+                    "Please ask about subjects, studies, "
+                    "demographics, medications, labs, "
+                    "adverse events, cohorts, or analytics."
+                )
+
+            }
+
+        # return {
+
+        #     "message":
+        #     "Unable to determine intent"
+        # }
