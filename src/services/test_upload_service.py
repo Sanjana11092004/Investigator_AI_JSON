@@ -8,8 +8,8 @@ service = (
 
 result = (
 
-    service.upload_and_ingest(
-        "incoming/SDTM_100patients.xlsx"
+    service.upload_file(
+        "uploads/SDTM_100patients.xlsx"
     )
 
 )

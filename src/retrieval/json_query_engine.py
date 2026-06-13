@@ -4,8 +4,8 @@ from src.retrieval.cache_manager import (
     CacheManager
 )
 
-from src.retrieval.index_builder import (
-    IndexBuilder
+from src.retrieval.index_registry import (
+    IndexRegistry
 )
 
 
@@ -16,8 +16,8 @@ class JSONQueryEngine:
         self.cache = CacheManager()
 
         self.index = (
-            IndexBuilder()
-            .build()
+            IndexRegistry
+            .get_index()
         )
 
     def _load_json(

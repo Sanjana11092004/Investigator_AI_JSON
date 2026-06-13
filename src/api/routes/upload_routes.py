@@ -1,72 +1,31 @@
-from pathlib import Path
+from fastapi import APIRouter, UploadFile, File
+
 import shutil
 
-from fastapi import (
-    APIRouter,
-    UploadFile,
-    File
-)
-
-from src.services.upload_service import (
-    UploadService
-)
+from src.services.upload_service import UploadService
 
 router = APIRouter()
-
-UPLOAD_DIR = Path(
-    "uploads"
-)
-
-UPLOAD_DIR.mkdir(
-    exist_ok=True
-)
 
 service = UploadService()
 
 
-@router.post(
-    "/upload"
-)
-async def upload_file(
+@router.post("/upload")
+def upload_file(file: UploadFile = File(...)):
 
-    file: UploadFile = File(...)
+    upload_path = f"uploads/{file.filename}"
 
-):
+    with open(upload_path, "wb") as buffer:
 
-    destination = (
+        shutil.copyfileobj(file.file, buffer)
 
-        UPLOAD_DIR
-        / file.filename
-
-    )
-
-    with open(
-        destination,
-        "wb"
-    ) as buffer:
-
-        shutil.copyfileobj(
-            file.file,
-            buffer
-        )
-
-    result = (
-
-        service.upload_and_ingest(
-            str(destination)
-        )
-
-    )
+    result = service.upload_file(upload_path)
 
     return result
 
 
-@router.get(
-    "/health"
-)
+@router.get("/health")
 def upload_health():
 
     return {
-        "status":
-        "upload route ready"
+        "status": "upload route ready"
     }

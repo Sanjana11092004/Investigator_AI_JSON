@@ -115,7 +115,9 @@ class PDFConverter:
 
         document = ClinicalDocument(
 
-            file_name="clinical_narratives",
+            file_name=Path(
+                file_path
+            ).stem,
 
             source_file=Path(
                 file_path

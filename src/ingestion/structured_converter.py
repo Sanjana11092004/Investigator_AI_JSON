@@ -202,6 +202,24 @@ class StructuredConverter:
             )
         )
 
+        # -------------------------
+        # FALLBACK FOR
+        # ALREADY-INGESTED STUDIES
+        # -------------------------
+
+        if not study_id:
+
+            study_id = (
+                payload
+                .get(
+                    "metadata",
+                    {}
+                )
+                .get(
+                    "study_id"
+                )
+            )
+
         document = ClinicalDocument(
             file_name=study_id,
             source_file=Path(

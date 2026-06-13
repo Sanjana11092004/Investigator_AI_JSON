@@ -8,23 +8,53 @@ class NarrativeSplitter:
         text: str
     ) -> list[str]:
 
-        pattern = r"(?=PAT-\d+\s*\|)"
+        # -------------------------
+        # FORMAT 1:
+        # CLINICAL NARRATIVE NOTE
+        # PT-101, PT-102 ...
+        # -------------------------
 
-        narratives = re.split(
-            pattern,
+        if re.search(
+            r"CLINICAL\s+NARRATIVE\s+NOTE\s+PT-\d+",
+            text
+        ):
+
+            parts = re.split(
+                r"(?=CLINICAL\s+NARRATIVE\s+NOTE\s+PT-\d+)",
+                text
+            )
+
+            return [
+
+                part.strip()
+
+                for part in parts
+
+                if part.strip().startswith(
+                    "CLINICAL NARRATIVE NOTE PT-"
+                )
+
+            ]
+
+        # -------------------------
+        # FORMAT 2:
+        # PAT-001 | ...
+        # PAT-002 | ...
+        # -------------------------
+
+        parts = re.split(
+            r"(?=PAT-\d+\s*\|)",
             text
         )
 
-        cleaned = []
+        return [
 
-        for narrative in narratives:
+            part.strip()
 
-            narrative = narrative.strip()
+            for part in parts
 
-            if narrative.startswith("PAT-"):
+            if part.strip().startswith(
+                "PAT-"
+            )
 
-                cleaned.append(
-                    narrative
-                )
-
-        return cleaned
+        ]

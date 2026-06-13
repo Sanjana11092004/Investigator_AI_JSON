@@ -14,33 +14,24 @@ class IndexBuilder:
 
     def build(self):
 
-        json_root = Path(
-            "json_store"
-        )
+        # IMPORTANT: reset index every build
+        self.index = JSONIndex()
 
-        for file_path in json_root.rglob(
-            "*.json"
-        ):
+        json_root = Path("json_store")
 
-            self._index_file(
-                file_path
-            )
+        for file_path in json_root.rglob("*.json"):
+            self._index_file(file_path)
 
-        for key, value in (
-            self.index.diagnosis_index.items()
-        ):
+        # convert sets → lists ONLY AT END (safe)
+        for key, value in list(self.index.diagnosis_index.items()):
             self.index.diagnosis_index[key] = list(value)
 
-        for key, value in (
-            self.index.medication_index.items()
-        ):
+        for key, value in list(self.index.medication_index.items()):
             self.index.medication_index[key] = list(value)
 
-        for key, value in (
-            self.index.lab_index.items()
-        ):
+        for key, value in list(self.index.lab_index.items()):
             self.index.lab_index[key] = list(value)
-        
+
         return self.index
 
     def _index_file(
