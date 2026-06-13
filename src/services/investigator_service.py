@@ -383,5 +383,9 @@ class InvestigatorService:
                 )
 
             }
+        
+        return {
+            "message": "Unable to determine intent"
+        }
 
         

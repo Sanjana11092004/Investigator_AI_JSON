@@ -17,5 +17,16 @@
     ],
     "active_domain": null,
     "last_query": null
+  },
+  "cohort1": {
+    "active_subject_id": null,
+    "active_patient_id": null,
+    "active_study_id": null,
+    "active_cohort": [
+      "SUBJ-0030",
+      "SUBJ-0020"
+    ],
+    "active_domain": null,
+    "last_query": null
   }
 }
