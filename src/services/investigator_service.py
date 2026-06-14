@@ -32,6 +32,10 @@ from src.services.reasoning_service import (
     ReasoningService
 )
 
+from src.services.investigator_reasoning_service import (
+    InvestigatorReasoningService
+)
+
 
 class InvestigatorService:
 
@@ -67,6 +71,10 @@ class InvestigatorService:
 
         self.reasoning = (
             ReasoningService()
+        )
+
+        self.investigator_reasoning = (
+            InvestigatorReasoningService()
         )
 
     def ask(
@@ -506,6 +514,30 @@ class InvestigatorService:
 
             return response
 
+        # -------------------------
+        # INVESTIGATOR REASONING
+        # -------------------------
+
+        if (
+            classification.get("action")
+            ==
+            "investigator_reasoning"
+        ):
+
+            return (
+
+                self.investigator_reasoning
+                .execute(
+
+                    classification.get(
+                        "metric"
+                    )
+
+                )
+
+            )
+        
+        
         # -------------------------
         # ANALYTICS
         # -------------------------
