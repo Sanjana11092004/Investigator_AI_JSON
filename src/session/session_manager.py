@@ -28,13 +28,19 @@ class SessionManager:
                 "active_patient_id": None,
                 "active_study_id": None,
 
-                # NEW
                 "active_cohort": [],
 
-                # NEW
                 "active_domain": None,
 
-                "last_query": None
+                "last_query": None,
+
+                "last_intent": None,
+
+                "last_action": None,
+
+                "last_answer": None,
+
+                "conversation_history": []
             }
 
         )
@@ -140,4 +146,81 @@ class SessionManager:
             session_id,
             "last_query",
             query
+        )
+
+    def set_last_intent(
+        self,
+        session_id: str,
+        intent: str
+    ):
+
+        self._update(
+            session_id,
+            "last_intent",
+            intent
+        )
+
+
+    def set_last_action(
+        self,
+        session_id: str,
+        action: str
+    ):
+
+        self._update(
+            session_id,
+            "last_action",
+            action
+        )
+
+
+    def set_last_answer(
+        self,
+        session_id: str,
+        answer: str
+    ):
+
+        self._update(
+            session_id,
+            "last_answer",
+            answer
+        )
+
+
+    def add_history(
+        self,
+        session_id: str,
+        question: str,
+        answer: str
+    ):
+
+        session = (
+            self.get(
+                session_id
+            )
+        )
+
+        history = (
+            session.get(
+                "conversation_history",
+                []
+            )
+        )
+
+        history.append(
+            {
+                "question": question,
+                "answer": answer
+            }
+        )
+
+        history = history[-10:]
+
+        session[
+            "conversation_history"
+        ] = history
+
+        self.store.save_session(
+            session_id,
+            session
         )

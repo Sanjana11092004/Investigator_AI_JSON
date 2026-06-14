@@ -24,6 +24,10 @@ from src.services.context_builder import (
     ContextBuilder
 )
 
+from src.services.analytics_service import (
+    AnalyticsService
+)
+
 
 class InvestigatorService:
 
@@ -53,6 +57,10 @@ class InvestigatorService:
             ContextBuilder()
         )
 
+        self.analytics = (
+            AnalyticsService()
+        )
+
     def ask(
         self,
         question: str,
@@ -76,7 +84,6 @@ class InvestigatorService:
                 session
             )
         )
-        print("CLASSIFICATION =", classification)
 
         intent = (
             classification.get(
@@ -176,13 +183,38 @@ class InvestigatorService:
                 )
             )
 
-            return (
+            response = (
                 self.response_generator
                 .generate_response(
                     question,
                     context
                 )
             )
+
+            self.sessions.set_last_intent(
+                session_id,
+                intent
+            )
+
+            self.sessions.set_last_action(
+                session_id,
+                classification.get(
+                    "action"
+                )
+            )
+
+            self.sessions.set_last_answer(
+                session_id,
+                response
+            )
+
+            self.sessions.add_history(
+                session_id,
+                question,
+                response
+            )
+
+            return response
 
         # -------------------------
         # PATIENT
@@ -204,13 +236,38 @@ class InvestigatorService:
                 )
             )
 
-            return (
+            response = (
                 self.response_generator
                 .generate_response(
                     question,
                     context
                 )
             )
+
+            self.sessions.set_last_intent(
+                session_id,
+                intent
+            )
+
+            self.sessions.set_last_action(
+                session_id,
+                classification.get(
+                    "action"
+                )
+            )
+
+            self.sessions.set_last_answer(
+                session_id,
+                response
+            )
+
+            self.sessions.add_history(
+                session_id,
+                question,
+                response
+            )
+
+            return response
 
         # -------------------------
         # STUDY
@@ -232,7 +289,7 @@ class InvestigatorService:
                 )
             )
 
-            return (
+            response = (
                 self.response_generator
                 .generate_response(
                     question,
@@ -240,23 +297,47 @@ class InvestigatorService:
                 )
             )
 
+            self.sessions.set_last_intent(
+                session_id,
+                intent
+            )
+
+            self.sessions.set_last_action(
+                session_id,
+                classification.get(
+                    "action"
+                )
+            )
+
+            self.sessions.set_last_answer(
+                session_id,
+                response
+            )
+
+            self.sessions.add_history(
+                session_id,
+                question,
+                response
+            )
+
+            return response
+
         # -------------------------
         # ANALYTICS
         # -------------------------
 
         if intent == "analytics":
 
-            return {
-
-                "average_age":
-                self.agg.average_age(),
-
-                "top_diagnoses":
-                self.agg.top_diagnoses(),
-
-                "top_medications":
-                self.agg.top_medications()
-            }
+            return (
+                self.analytics.execute(
+                    classification.get(
+                        "action"
+                    ),
+                    classification.get(
+                        "metric"
+                    )
+                )
+            )
 
         # -------------------------
         # OUT OF SCOPE

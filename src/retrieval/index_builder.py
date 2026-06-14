@@ -253,3 +253,55 @@ class IndexBuilder:
                     ).add(
                         subject_id
                     )
+
+                    self.index.lab_result_index.setdefault(
+                        lab_name.lower(),
+                        []
+                    )
+
+                    self.index.lab_result_index[
+                        lab_name.lower()
+                    ].append(
+
+                        {
+                            "subject_id": subject_id,
+
+                            "value":
+                            record.get(
+                                "LBSTRESN"
+                            ),
+
+                            "unit":
+                            record.get(
+                                "LBSTRESU"
+                            ),
+
+                            "flag":
+                            record.get(
+                                "LBNRIND"
+                            )
+                        }
+
+                    )
+
+                # ---------------------
+                # ADVERSE EVENT INDEX
+                # ---------------------
+                ae_term = (
+                    record.get(
+                        "AETERM"
+                    )
+                )
+
+                if ae_term:
+
+                    self.index.ae_index.setdefault(
+                        ae_term.lower(),
+                        []
+                    )
+
+                    self.index.ae_index[
+                        ae_term.lower()
+                    ].append(
+                        subject_id
+                    )

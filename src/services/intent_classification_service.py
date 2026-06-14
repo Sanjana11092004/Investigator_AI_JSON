@@ -1,4 +1,5 @@
 import json
+import re
 
 from src.llm.groq_service import (
     GroqService
@@ -26,14 +27,163 @@ Current Session Context:
 
 {json.dumps(session_context, indent=2)}
 
+IMPORTANT:
+
+Use the active entity, previous questions,
+previous answers, and conversation history
+to resolve follow-up questions.
+
+Examples:
+
+Previous:
+Summarize patient PT-101
+
+Current:
+What medications is she taking?
+
+Return:
+
+{{
+    "intent": "patient",
+    "entity_type": "patient",
+    "entity_id": "PT-101",
+    "action": "medications",
+    "metric": null
+}}
+
+Previous:
+Summarize study NCT01007279
+
+Current:
+Who sponsored it?
+
+Return:
+
+{{
+    "intent": "study",
+    "entity_type": "study",
+    "entity_id": "NCT01007279",
+    "action": "retrieve",
+    "metric": null
+}}
+
+Previous:
+Summarize subject SUBJ-0001
+
+Current:
+Any lab abnormalities?
+
+Return:
+
+{{
+    "intent": "subject",
+    "entity_type": "subject",
+    "entity_id": "SUBJ-0001",
+    "action": "labs",
+    "metric": null
+}}
+
+Question:
+How many participants?
+
+Return:
+
+{{
+    "intent": "analytics",
+    "entity_type": "cohort",
+    "entity_id": null,
+    "action": "count",
+    "metric": "participants"
+}}
+
+Question:
+How many females?
+
+Return:
+
+{{
+    "intent": "analytics",
+    "entity_type": "cohort",
+    "entity_id": null,
+    "action": "count",
+    "metric": "female"
+}}
+
+Question:
+How many males?
+
+Return:
+
+{{
+    "intent": "analytics",
+    "entity_type": "cohort",
+    "entity_id": null,
+    "action": "count",
+    "metric": "male"
+}}
+
+Question:
+Average age?
+
+Return:
+
+{{
+    "intent": "analytics",
+    "entity_type": "cohort",
+    "entity_id": null,
+    "action": "average",
+    "metric": "age"
+}}
+
+Question:
+Maximum ALT value?
+
+Return:
+
+{{
+    "intent": "analytics",
+    "entity_type": "cohort",
+    "entity_id": null,
+    "action": "max",
+    "metric": "alanine aminotransferase"
+}}
+
+Question:
+Minimum Creatinine?
+
+Return:
+
+{{
+    "intent": "analytics",
+    "entity_type": "cohort",
+    "entity_id": null,
+    "action": "min",
+    "metric": "creatinine"
+}}
+
+Question:
+Most common adverse event?
+
+Return:
+
+{{
+    "intent": "analytics",
+    "entity_type": "cohort",
+    "entity_id": null,
+    "action": "frequency",
+    "metric": "adverse_event"
+}}
+
 Determine:
 
 1. intent
 2. entity_type
 3. entity_id
 4. action
+5. metric
 
 Allowed intents:
+
 study
 subject
 patient
@@ -42,6 +192,7 @@ analytics
 out_of_scope
 
 Allowed actions:
+
 summarize
 retrieve
 demographics
@@ -49,9 +200,15 @@ medications
 labs
 adverse_events
 diagnosis
-analytics
 compare
 explain
+
+count
+average
+min
+max
+frequency
+
 unknown
 
 IMPORTANT:
@@ -64,7 +221,16 @@ IMPORTANT:
   - this subject
   - this study
   - it
-- Return ONLY valid JSON.
+
+CRITICAL:
+
+Return ONLY a JSON object.
+
+Do not explain.
+Do not add reasoning.
+Do not add markdown.
+Do not add code fences.
+Do not add any text before or after the JSON.
 
 Question:
 {question}
@@ -75,7 +241,8 @@ Output Format:
     "intent": "...",
     "entity_type": "...",
     "entity_id": "...",
-    "action": "..."
+    "action": "...",
+    "metric": "..."
 }}
 """
 
@@ -84,6 +251,10 @@ Output Format:
                 prompt
             )
         )
+
+        print("\nRAW CLASSIFIER RESPONSE:")
+        print(response)
+        print()
 
         if response.startswith("```"):
 
@@ -96,15 +267,47 @@ Output Format:
 
         try:
 
-            return json.loads(
-                response
+            start = response.find("{")
+
+            end = response.rfind("}")
+
+            if (
+                start != -1
+                and
+                end != -1
+            ):
+
+                return json.loads(
+                    response[
+                        start:end+1
+                    ]
+                )
+
+        except Exception as e:
+
+            print(
+                "CLASSIFIER PARSE ERROR:",
+                e
             )
 
-        except Exception:
+        return {
+            "intent": "out_of_scope",
+            "entity_type": "none",
+            "entity_id": None,
+            "action": "unknown",
+            "metric": None
+        }
 
-            return {
-                "intent": "out_of_scope",
-                "entity_type": "none",
-                "entity_id": None,
-                "action": "unknown"
-            }
+
+if __name__ == "__main__":
+
+    service = (
+        IntentClassificationService()
+    )
+
+    print(
+        service.classify(
+            "Average age?",
+            {}
+        )
+    )

@@ -17,3 +17,9 @@ class JSONIndex:
         self.medication_index = {}
 
         self.lab_index = {}
+
+        # NEW
+
+        self.lab_result_index = {}
+
+        self.ae_index = {}
