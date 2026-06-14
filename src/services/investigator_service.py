@@ -1,6 +1,3 @@
-from src.retrieval.natural_language_router import (
-    NaturalLanguageRouter
-)
 
 from src.retrieval.json_query_engine import (
     JSONQueryEngine
@@ -10,26 +7,27 @@ from src.retrieval.aggregations import (
     Aggregations
 )
 
-from src.retrieval.cohort_service import (
-    CohortService
-)
 
 from src.session.session_manager import (
     SessionManager
 )
 
-from src.services.response_formatter import (
-    ResponseFormatter
+from src.services.response_generation_service import (
+    ResponseGenerationService
+)
+
+from src.services.intent_classification_service import (
+    IntentClassificationService
+)
+
+from src.services.context_builder import (
+    ContextBuilder
 )
 
 
 class InvestigatorService:
 
     def __init__(self):
-
-        self.router = (
-            NaturalLanguageRouter()
-        )
 
         self.engine = (
             JSONQueryEngine()
@@ -39,16 +37,20 @@ class InvestigatorService:
             Aggregations()
         )
 
-        self.cohort = (
-            CohortService()
-        )
-
         self.sessions = (
             SessionManager()
         )
 
-        self.formatter = (
-            ResponseFormatter()
+        self.response_generator = (
+            ResponseGenerationService()
+        )
+
+        self.intent_classifier = (
+            IntentClassificationService()
+        )
+
+        self.context_builder = (
+            ContextBuilder()
         )
 
     def ask(
@@ -61,272 +63,152 @@ class InvestigatorService:
             session_id
         )
 
-        intent, value = (
-            self.router.route(
-                question
-            )
-        )
-
         session = (
             self.sessions.get(
                 session_id
             )
         )
 
+        classification = (
+            self.intent_classifier
+            .classify(
+                question,
+                session
+            )
+        )
+        print("CLASSIFICATION =", classification)
+
+        intent = (
+            classification.get(
+                "intent"
+            )
+        )
+
+        value = (
+            classification.get(
+                "entity_id"
+            )
+        )
+
         # -------------------------
-        # SESSION SUBJECT MEMORY
+        # SESSION MEMORY RESOLUTION
         # -------------------------
 
-        if (
-            value is None
-            and
-            session
+        if value is None:
+
+            if intent == "patient":
+
+                value = (
+                    session.get(
+                        "active_patient_id"
+                    )
+                )
+
+            elif intent == "study":
+
+                value = (
+                    session.get(
+                        "active_study_id"
+                    )
+                )
+
+            elif intent == "subject":
+
+                value = (
+                    session.get(
+                        "active_subject_id"
+                    )
+                )
+
+        # -------------------------
+        # STORE ACTIVE ENTITY
+        # -------------------------
+
+        if isinstance(
+            value,
+            str
         ):
 
-            active_subject = (
-                session.get(
-                    "active_subject_id"
+            if value.startswith(
+                "PT-"
+            ):
+
+                self.sessions.set_active_patient(
+                    session_id,
+                    value
                 )
-            )
 
-            if active_subject:
-
-                if intent in [
-
-                    "subject_demographics",
-                    "subject_medications",
-                    "subject_labs",
-                    "subject_ae",
-                    "subject_all"
-
-                ]:
-
-                    value = active_subject
-
-        # -------------------------
-        # STORE ACTIVE SUBJECT
-        # -------------------------
-
-        if (
-            isinstance(
-                value,
-                str
-            )
-            and
-            value.startswith(
+            elif value.startswith(
                 "SUBJ-"
-            )
-        ):
+            ):
 
-            self.sessions.set_active_subject(
-                session_id,
-                value
+                self.sessions.set_active_subject(
+                    session_id,
+                    value
+                )
+
+            elif value.startswith(
+                "NCT"
+            ):
+
+                self.sessions.set_active_study(
+                    session_id,
+                    value
+                )
+
+        # -------------------------
+        # SUBJECT
+        # -------------------------
+
+        if intent == "subject":
+
+            subject_data = (
+                self.engine
+                .get_subject_data(
+                    value
+                )
+            )
+
+            context = (
+                self.context_builder
+                .build_subject_context(
+                    subject_data
+                )
+            )
+
+            return (
+                self.response_generator
+                .generate_response(
+                    question,
+                    context
+                )
             )
 
         # -------------------------
-        # COHORT QUERIES
+        # PATIENT
         # -------------------------
 
-        if intent == "cohort_diagnosis":
+        if intent == "patient":
 
-            cohort = (
-                self.cohort
-                .diagnosis(
-                    value
-                )
-            )
-
-            self.sessions.set_active_cohort(
-                session_id,
-                cohort
-            )
-
-            return {
-
-                "cohort_size":
-                len(cohort),
-
-                "subjects":
-                cohort
-            }
-
-        if intent == "cohort_female":
-
-            current = (
-                session.get(
-                    "active_cohort",
-                    []
-                )
-            )
-
-            result = (
-                self.cohort.sex(
-                    current,
-                    "F"
-                )
-            )
-
-            self.sessions.set_active_cohort(
-                session_id,
-                result
-            )
-
-            return {
-
-                "cohort_size":
-                len(result),
-
-                "subjects":
-                result
-            }
-
-        if intent == "cohort_male":
-
-            current = (
-                session.get(
-                    "active_cohort",
-                    []
-                )
-            )
-
-            result = (
-                self.cohort.sex(
-                    current,
-                    "M"
-                )
-            )
-
-            self.sessions.set_active_cohort(
-                session_id,
-                result
-            )
-
-            return {
-
-                "cohort_size":
-                len(result),
-
-                "subjects":
-                result
-            }
-
-        if intent == "cohort_age_gt":
-
-            current = (
-                session.get(
-                    "active_cohort",
-                    []
-                )
-            )
-
-            result = (
-                self.cohort
-                .age_greater_than(
-                    current,
-                    value
-                )
-            )
-
-            self.sessions.set_active_cohort(
-                session_id,
-                result
-            )
-
-            return {
-
-                "cohort_size":
-                len(result),
-
-                "subjects":
-                result
-            }
-
-        # -------------------------
-        # SUBJECT QUERIES
-        # -------------------------
-
-        if intent == "subject_all":
-
-            return (
+            patient_data = (
                 self.engine
-                .get_subject_data(
+                .get_patient(
                     value
                 )
             )
 
-        if intent == "subject_demographics":
-
-            records = (
-                self.engine
-                .get_subject_data(
-                    value
-                )
-                .get(
-                    "demographics"
+            context = (
+                self.context_builder
+                .build_patient_context(
+                    patient_data
                 )
             )
 
             return (
-                self.formatter
-                .format_demographics(
-                    records
-                )
-            )
-
-        if intent == "subject_medications":
-
-            records = (
-                self.engine
-                .get_subject_data(
-                    value
-                )
-                .get(
-                    "medications"
-                )
-            )
-
-            return (
-                self.formatter
-                .format_medications(
-                    records
-                )
-            )
-
-        if intent == "subject_labs":
-
-            records = (
-                self.engine
-                .get_subject_data(
-                    value
-                )
-                .get(
-                    "labs"
-                )
-            )
-
-            return (
-                self.formatter
-                .format_labs(
-                    records
-                )
-            )
-
-        if intent == "subject_ae":
-
-            records = (
-                self.engine
-                .get_subject_data(
-                    value
-                )
-                .get(
-                    "adverse_events"
-                )
-            )
-
-            return (
-                self.formatter
-                .format_adverse_events(
-                    records
+                self.response_generator
+                .generate_response(
+                    question,
+                    context
                 )
             )
 
@@ -336,56 +218,63 @@ class InvestigatorService:
 
         if intent == "study":
 
-            return (
+            study_data = (
                 self.engine
                 .get_study(
                     value
                 )
             )
 
+            context = (
+                self.context_builder
+                .build_study_context(
+                    study_data
+                )
+            )
+
+            return (
+                self.response_generator
+                .generate_response(
+                    question,
+                    context
+                )
+            )
+
         # -------------------------
-        # AGGREGATIONS
+        # ANALYTICS
         # -------------------------
 
-        if intent == "average_age":
+        if intent == "analytics":
 
             return {
+
                 "average_age":
-                self.agg.average_age()
-            }
+                self.agg.average_age(),
 
-        if intent == "top_diagnoses":
-
-            return {
                 "top_diagnoses":
-                self.agg.top_diagnoses()
-            }
+                self.agg.top_diagnoses(),
 
-        if intent == "top_medications":
-
-            return {
                 "top_medications":
                 self.agg.top_medications()
             }
-        
-        if intent == "out_of_scope":
 
-            return {
+        # -------------------------
+        # OUT OF SCOPE
+        # -------------------------
 
-                "message":
-
-                (
-                    "This system supports clinical trial "
-                    "investigations only. "
-                    "Please ask about subjects, studies, "
-                    "demographics, medications, labs, "
-                    "adverse events, cohorts, or analytics."
-                )
-
-            }
-        
         return {
-            "message": "Unable to determine intent"
-        }
 
+            "message":
+
+            (
+                "This system supports clinical trial "
+                "investigations only. "
+                "Please ask about patients, subjects, "
+                "studies, medications, diagnoses, "
+                "laboratory results, adverse events, "
+                "clinical summaries, cohorts, or analytics."
+            )
+
+        }
+        
         

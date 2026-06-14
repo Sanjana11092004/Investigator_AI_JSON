@@ -28,5 +28,21 @@
     ],
     "active_domain": null,
     "last_query": null
+  },
+  "test": {
+    "active_subject_id": "SUBJ-0001",
+    "active_patient_id": "PT-102",
+    "active_study_id": null,
+    "active_cohort": [],
+    "active_domain": null,
+    "last_query": null
+  },
+  "Summarize patient PT-101": {
+    "active_subject_id": null,
+    "active_patient_id": null,
+    "active_study_id": null,
+    "active_cohort": [],
+    "active_domain": null,
+    "last_query": null
   }
 }

@@ -4,8 +4,8 @@ from src.ingestion.pdf_processor import (
     PDFProcessor
 )
 
-from src.ingestion.narrative_splitter import (
-    NarrativeSplitter
+from src.ingestion.smart_segmenter import (
+    SmartSegmenter
 )
 
 from src.ingestion.groq_clinical_extractor import (
@@ -38,7 +38,7 @@ class PDFConverter:
         )
 
         self.splitter = (
-            NarrativeSplitter()
+            SmartSegmenter()
         )
 
         self.extractor = (
