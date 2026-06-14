@@ -86,6 +86,34 @@ Adverse Events:
             )
         )
 
+        sponsors = (
+            protocol.get(
+                "sponsorCollaboratorsModule",
+                {}
+            )
+        )
+
+        outcomes = (
+            protocol.get(
+                "outcomesModule",
+                {}
+            )
+        )
+
+        eligibility = (
+            protocol.get(
+                "eligibilityModule",
+                {}
+            )
+        )
+
+        locations = (
+            protocol.get(
+                "contactsLocationsModule",
+                {}
+            )
+        )
+
         context = f"""
     Study ID:
     {identification.get('nctId')}
@@ -96,6 +124,17 @@ Adverse Events:
     Official Title:
     {identification.get('officialTitle')}
 
+    Acronym:
+    {identification.get('acronym')}
+
+    Sponsor:
+    {sponsors.get(
+        'leadSponsor',
+        {}
+    ).get(
+        'name'
+    )}
+
     Status:
     {status.get('overallStatus')}
 
@@ -105,8 +144,45 @@ Adverse Events:
     Phase:
     {', '.join(design.get('phases', []))}
 
+    Enrollment:
+    {design.get(
+        'enrollmentInfo',
+        {}
+    ).get(
+        'count'
+    )}
+
+    Study Start Date:
+    {status.get(
+        'startDateStruct',
+        {}
+    ).get(
+        'date'
+    )}
+
+    Primary Completion Date:
+    {status.get(
+        'primaryCompletionDateStruct',
+        {}
+    ).get(
+        'date'
+    )}
+
+    Study Completion Date:
+    {status.get(
+        'completionDateStruct',
+        {}
+    ).get(
+        'date'
+    )}
+
     Conditions:
-    {', '.join(conditions.get('conditions', []))}
+    {', '.join(
+        conditions.get(
+            'conditions',
+            []
+        )
+    )}
 
     Summary:
     {summary.get('briefSummary')}
@@ -121,115 +197,50 @@ Adverse Events:
             )
         ]
     )}
-    """
 
-        return context.strip()
-
-
-    def build_subject_context(
-        self,
-        subject: dict
-    ) -> str:
-
-        if not subject:
-            return "No subject data found."
-
-        demographics = (
-            subject.get(
-                "demographics",
-                []
-            )
-        )
-
-        medications = (
-            subject.get(
-                "medications",
-                []
-            )
-        )
-
-        adverse_events = (
-            subject.get(
-                "adverse_events",
-                []
-            )
-        )
-
-        medical_history = (
-            subject.get(
-                "medical_history",
-                []
-            )
-        )
-
-        labs = (
-            subject.get(
-                "labs",
-                []
-            )
-        )
-
-        dm = (
-            demographics[0]
-            if demographics
-            else {}
-        )
-
-        lab_summary = []
-
-        for lab in labs[:10]:
-
-            lab_summary.append(
-
-                f"{lab.get('LBTESTCD')}: "
-                f"{lab.get('LBSTRESN')} "
-                f"{lab.get('LBSTRESU')} "
-                f"({lab.get('LBNRIND')})"
-
-            )
-
-        context = f"""
-    Subject ID:
-    {dm.get('USUBJID')}
-
-    Age:
-    {dm.get('AGE')}
-
-    Sex:
-    {dm.get('SEX')}
-
-    Diagnosis:
-    {dm.get('DIAGNOSIS')}
-
-    BMI:
-    {dm.get('BMI')}
-
-    Medical History:
+    Primary Outcomes:
     {', '.join(
         [
-            mh.get('MHTERM')
-            for mh in medical_history
+            outcome.get('measure')
+            for outcome in outcomes.get(
+                'primaryOutcomes',
+                []
+            )
         ]
     )}
 
-    Medications:
+    Secondary Outcomes:
     {', '.join(
         [
-            med.get('CMTRT')
-            for med in medications
+            outcome.get('measure')
+            for outcome in outcomes.get(
+                'secondaryOutcomes',
+                []
+            )
         ]
     )}
 
-    Adverse Events:
-    {', '.join(
-        [
-            ae.get('AETERM')
-            for ae in adverse_events
-        ]
+    Eligibility Criteria:
+    {eligibility.get(
+        'eligibilityCriteria'
     )}
 
-    Key Labs:
-    {chr(10).join(lab_summary)}
+    Eligible Sex:
+    {eligibility.get('sex')}
+
+    Minimum Age:
+    {eligibility.get('minimumAge')}
+
+    Locations:
+    {', '.join(
+        [
+            f"{location.get('facility')} - {location.get('city')}, {location.get('country')}"
+            for location in locations.get(
+                'locations',
+                []
+            )
+        ]
+    )}
     """
 
         return context.strip()

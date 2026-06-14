@@ -174,6 +174,58 @@ Return:
     "metric": "adverse_event"
 }}
 
+Question:
+Summarize patient PT-101
+
+Return:
+
+{{
+    "intent": "patient",
+    "entity_type": "patient",
+    "entity_id": "PT-101",
+    "action": "summarize",
+    "metric": null
+}}
+
+Question:
+Summarize subject SUBJ-0001
+
+Return:
+
+{{
+    "intent": "subject",
+    "entity_type": "subject",
+    "entity_id": "SUBJ-0001",
+    "action": "summarize",
+    "metric": null
+}}
+
+Question:
+Summarize study NCT01007279
+
+Return:
+
+{{
+    "intent": "study",
+    "entity_type": "study",
+    "entity_id": "NCT01007279",
+    "action": "summarize",
+    "metric": null
+}}
+
+Question:
+How many participants were enrolled in NCT01007279?
+
+Return:
+
+{{
+    "intent": "study",
+    "entity_type": "study",
+    "entity_id": "NCT01007279",
+    "action": "retrieve",
+    "metric": "enrollment"
+}}
+
 Determine:
 
 1. intent
@@ -193,6 +245,17 @@ out_of_scope
 
 Allowed actions:
 
+IMPORTANT:
+
+The words:
+- summarize
+- summary
+- overview
+
+must map to:
+
+action = summarize
+
 summarize
 retrieve
 demographics
@@ -210,6 +273,27 @@ max
 frequency
 
 unknown
+
+IMPORTANT:
+
+Questions about:
+- sponsor
+- enrollment
+- participants enrolled
+- outcomes
+- eligibility
+- location
+- phase
+- status
+- intervention
+
+must be classified as:
+
+intent = study
+action = retrieve
+
+NOT analytics
+
 
 IMPORTANT:
 

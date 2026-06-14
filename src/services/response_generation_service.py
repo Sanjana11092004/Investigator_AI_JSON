@@ -71,6 +71,12 @@ class ResponseGenerationService:
     - For comparisons clearly explain differences.
     - For analytics explain findings in plain English.
     - Do not mention JSON, retrieval systems, indexes, databases, caches or implementation details.
+    
+    For comparison requests:
+    - Compare entities side-by-side.
+    - Highlight similarities first.
+    - Highlight differences second.
+    - Conclude with the most clinically relevant distinction.
 
     Question:
     {question}

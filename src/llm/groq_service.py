@@ -72,8 +72,29 @@ class GroqService:
         response = (
             self.client.chat.completions.create(
                 model="llama-3.3-70b-versatile",
-                temperature=0.2,
+                temperature=0,
                 messages=[
+                    {
+                        "role": "system",
+                        "content":
+                        """
+    You are a Clinical Investigator AI.
+
+    Requirements:
+
+    - Ground every answer in supplied evidence.
+    - Never hallucinate.
+    - Never fabricate values.
+    - Explain findings clearly.
+    - Compare entities when requested.
+    - Perform clinical reasoning when requested.
+    - Identify important safety signals.
+    - Identify abnormal laboratory findings.
+    - Explain medication-diagnosis relationships.
+    - Explain adverse event relationships.
+    - Highlight uncertainty when evidence is insufficient.
+    """
+                    },
                     {
                         "role": "user",
                         "content": prompt
@@ -83,10 +104,8 @@ class GroqService:
         )
 
         return (
-
             response
             .choices[0]
             .message
             .content
-
         )

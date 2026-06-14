@@ -40,7 +40,9 @@ class SessionManager:
 
                 "last_answer": None,
 
-                "conversation_history": []
+                "conversation_history": [],
+
+                "last_compared_entities": []
             }
 
         )
@@ -223,4 +225,16 @@ class SessionManager:
         self.store.save_session(
             session_id,
             session
+        )
+
+    def set_last_comparison(
+        self,
+        session_id: str,
+        entities: list
+    ):
+
+        self._update(
+            session_id,
+            "last_compared_entities",
+            entities
         )
