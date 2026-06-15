@@ -109,10 +109,33 @@
     "active_cohort": [],
     "active_domain": null,
     "last_query": null,
-    "last_intent": null,
-    "last_action": null,
-    "last_answer": null,
-    "conversation_history": [],
+    "last_intent": "subject",
+    "last_action": "demographics",
+    "last_answer": "The age of patient SUBJ-0001 is 82 years old. This information is directly provided in the clinical context under the \"Age\" section. As the patient is 82 years old and has a diagnosis of COPD, along with a medical history of asthma, their age may be a relevant factor in considering the management and prognosis of their condition, given the potential for age-related declines in lung function. However, without further information on how age specifically influences the patient's condition or treatment outcomes in this context, the clinical significance of the patient's age remains general.",
+    "conversation_history": [
+      {
+        "question": "What is the age of patient SUBJ-0001?",
+        "answer": "The age of patient SUBJ-0001 is 82 years old. This information is directly provided in the clinical context under the \"Age\" section. As the patient is 82 years old and has a diagnosis of COPD, along with a medical history of asthma, their age may be a relevant factor in considering the management and prognosis of their condition, given the potential for age-related declines in lung function. However, without further information on how age specifically influences the patient's condition or treatment outcomes in this context, the clinical significance of the patient's age remains general."
+      }
+    ],
+    "last_compared_entities": []
+  },
+  "7bd1ff0d-1055-421a-9662-cfb5d81234ff": {
+    "active_subject_id": "SUBJ-0001",
+    "active_patient_id": null,
+    "active_study_id": null,
+    "active_cohort": [],
+    "active_domain": null,
+    "last_query": null,
+    "last_intent": "subject",
+    "last_action": "demographics",
+    "last_answer": "The age of patient SUBJ-0001 is 82 years old. This information is directly provided in the clinical context under the \"Age\" section. As the patient is 82 years old and has a diagnosis of COPD, along with a medical history of asthma, their age may be a relevant factor in considering the management and prognosis of their condition, given the potential for age-related declines in lung function and increased susceptibility to respiratory complications. However, without further information on how age specifically influences the patient's current condition or treatment outcomes, the clinical significance of this age in the context of the provided information remains general.",
+    "conversation_history": [
+      {
+        "question": "What is the age of patient SUBJ-0001?",
+        "answer": "The age of patient SUBJ-0001 is 82 years old. This information is directly provided in the clinical context under the \"Age\" section. As the patient is 82 years old and has a diagnosis of COPD, along with a medical history of asthma, their age may be a relevant factor in considering the management and prognosis of their condition, given the potential for age-related declines in lung function and increased susceptibility to respiratory complications. However, without further information on how age specifically influences the patient's current condition or treatment outcomes, the clinical significance of this age in the context of the provided information remains general."
+      }
+    ],
     "last_compared_entities": []
   }
 }
