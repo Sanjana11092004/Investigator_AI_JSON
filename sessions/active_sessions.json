@@ -101,5 +101,18 @@
       "NCT01007279",
       "NCT02178735"
     ]
+  },
+  "test123": {
+    "active_subject_id": "SUBJ-0001",
+    "active_patient_id": null,
+    "active_study_id": null,
+    "active_cohort": [],
+    "active_domain": null,
+    "last_query": null,
+    "last_intent": null,
+    "last_action": null,
+    "last_answer": null,
+    "conversation_history": [],
+    "last_compared_entities": []
   }
 }

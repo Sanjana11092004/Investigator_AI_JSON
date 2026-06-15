@@ -20,12 +20,37 @@ from src.api.routes.investigator_routes import (
     router as investigator_router
 )
 
+from src.api.routes.dashboard_routes import (
+    router as dashboard_router
+)
+
 app = FastAPI(
 
     title="Investigator AI",
 
     version="1.0.0"
 )
+
+
+@app.get("/")
+def root():
+
+    return {
+
+        "application":
+            "Investigator AI",
+
+        "status":
+            "running"
+    }
+
+@app.get("/health")
+def health():
+    return {
+        "status": "healthy",
+        "service": "Investigator AI"
+    }
+
 
 app.include_router(
 
@@ -69,15 +94,6 @@ app.include_router(
     tags=["Investigator"]
 )
 
-
-@app.get("/")
-def root():
-
-    return {
-
-        "application":
-            "Investigator AI",
-
-        "status":
-            "running"
-    }
+app.include_router(
+    dashboard_router
+)

@@ -244,3 +244,112 @@ Adverse Events:
     """
 
         return context.strip()
+
+
+    def build_subject_context(
+        self,
+        subject: dict
+    ) -> str:
+
+        if not subject:
+            return "No subject data found."
+
+        demographics = (
+            subject.get(
+                "demographics",
+                []
+            )
+        )
+
+        medications = (
+            subject.get(
+                "medications",
+                []
+            )
+        )
+
+        adverse_events = (
+            subject.get(
+                "adverse_events",
+                []
+            )
+        )
+
+        medical_history = (
+            subject.get(
+                "medical_history",
+                []
+            )
+        )
+
+        labs = (
+            subject.get(
+                "labs",
+                []
+            )
+        )
+
+        dm = (
+            demographics[0]
+            if demographics
+            else {}
+        )
+
+        lab_summary = []
+
+        for lab in labs[:10]:
+
+            lab_summary.append(
+
+                f"{lab.get('LBTESTCD')}: "
+                f"{lab.get('LBSTRESN')} "
+                f"{lab.get('LBSTRESU')} "
+                f"({lab.get('LBNRIND')})"
+
+            )
+
+        context = f"""
+    Subject ID:
+    {dm.get('USUBJID')}
+
+    Age:
+    {dm.get('AGE')}
+
+    Sex:
+    {dm.get('SEX')}
+
+    Diagnosis:
+    {dm.get('DIAGNOSIS')}
+
+    BMI:
+    {dm.get('BMI')}
+
+    Medical History:
+    {', '.join(
+        [
+            mh.get('MHTERM')
+            for mh in medical_history
+        ]
+    )}
+
+    Medications:
+    {', '.join(
+        [
+            med.get('CMTRT')
+            for med in medications
+        ]
+    )}
+
+    Adverse Events:
+    {', '.join(
+        [
+            ae.get('AETERM')
+            for ae in adverse_events
+        ]
+    )}
+
+    Key Labs:
+    {chr(10).join(lab_summary)}
+    """
+
+        return context.strip()
