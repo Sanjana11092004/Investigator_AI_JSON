@@ -1,25 +1,59 @@
+# Virtual Environment
 venv/
+.venv/
 
+# Python Cache
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
 
-.pytest_cache/
-
+# Environment Variables
 .env
 
-metadata/*.db
+# ChromaDB Vector Store
+vector_db/
 
-*.log
+# Uploaded Files
+uploads/*
+!uploads/.gitkeep
 
-.idea/
-
-.vscode/
-
-*.pyc
-
-json_store/*
-!json_store/.gitkeep
-
+# Incoming Files
 incoming/*
 !incoming/.gitkeep
 
-uploads/
+# Generated JSON Data
+json_store/*
+!json_store/.gitkeep
+
+# Session Memory
+sessions/*
+!sessions/.gitkeep
+
+# Metadata Database
+metadata/
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Test Outputs
+test_output/
+coverage/
+.pytest_cache/
+
+# HuggingFace Cache
+.cache/
+
+# Streamlit
+.streamlit/

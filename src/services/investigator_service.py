@@ -36,6 +36,10 @@ from src.services.investigator_reasoning_service import (
     InvestigatorReasoningService
 )
 
+from src.vector.semantic_search_service import (
+    SemanticSearchService
+)
+
 
 class InvestigatorService:
 
@@ -77,6 +81,10 @@ class InvestigatorService:
             InvestigatorReasoningService()
         )
 
+        self.semantic_search = (
+            SemanticSearchService()
+        )
+
     def ask(
         self,
         question: str,
@@ -105,9 +113,12 @@ class InvestigatorService:
             )
         )
 
+
         print("\nCLASSIFICATION:")
         print(classification)
         print()
+
+        
 
         if (
             classification.get("action")
@@ -269,6 +280,46 @@ class InvestigatorService:
                 "entity_id"
             )
         )
+
+        if (
+
+        classification.get(
+                "entity_id"
+            ) is None
+
+        ):
+
+            docs = (
+                self.semantic_search.search(
+                    question
+                )
+            )
+
+            if docs:
+
+                print(
+                    "\n=== USING SEMANTIC SEARCH ===\n"
+                )
+
+                context = "\n\n".join(
+
+                    doc.page_content
+
+                    for doc in docs
+
+                )
+
+                response = (
+                    self.reasoning.reason(
+                        question,
+                        context
+                    )
+                )
+
+                return {
+                    "response": response,
+                    "source": "semantic_search"
+                }
 
         # -------------------------
         # SESSION MEMORY RESOLUTION
@@ -554,6 +605,38 @@ class InvestigatorService:
                     )
                 )
             )
+
+        # -------------------------
+        # SEMANTIC FALLBACK
+        # -------------------------
+
+        docs = (
+            self.semantic_search.search(
+                question
+            )
+        )
+
+        if docs:
+
+            context = "\n\n".join(
+
+                doc.page_content
+
+                for doc in docs
+
+            )
+
+            response = (
+                self.reasoning.reason(
+                    question,
+                    context
+                )
+            )
+
+            return {
+                "response": response,
+                "source": "semantic_search"
+            }
 
         # -------------------------
         # OUT OF SCOPE

@@ -28,6 +28,14 @@ from src.storage.metadata_store import (
     MetadataStore
 )
 
+from src.vector.chunking_service import (
+    ChunkingService
+)
+
+from src.vector.vector_store import (
+    VectorStore
+)
+
 
 class PDFConverter:
 
@@ -51,6 +59,14 @@ class PDFConverter:
 
         self.metadata_store = (
             MetadataStore()
+        )
+
+        self.chunker = (
+            ChunkingService()
+        )
+
+        self.vector_store = (
+            VectorStore()
         )
 
     def process_pdf(
@@ -79,6 +95,23 @@ class PDFConverter:
             .extract_text(
                 file_path
             )
+        )
+
+        chunks = (
+            self.chunker
+            .chunk_text(text)
+        )
+
+        self.vector_store.store_document(
+
+            Path(file_path).stem,
+
+            chunks
+
+        )
+
+        print(
+            f"Stored {len(chunks)} chunks in ChromaDB"
         )
 
         narratives = (

@@ -96,6 +96,36 @@ class SmartSegmenter:
 
             ]
 
+
+        # --------------------------------
+        # FORMAT 3
+        # MR-201 style narratives
+        # --------------------------------
+
+        if re.search(
+            r"CLINICAL\s+NARRATIVE\s+NOTE\s+MR-\d+",
+            text,
+            re.IGNORECASE
+        ):
+
+            parts = re.split(
+                r"(?=CLINICAL\s+NARRATIVE\s+NOTE\s+MR-\d+)",
+                text,
+                flags=re.IGNORECASE
+            )
+
+            return [
+
+                part.strip()
+
+                for part in parts
+
+                if part.strip().upper().startswith(
+                    "CLINICAL NARRATIVE NOTE"
+                )
+
+            ]
+
         # --------------------------------
         # FALLBACK
         # --------------------------------

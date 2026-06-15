@@ -306,6 +306,47 @@ IMPORTANT:
   - this study
   - it
 
+IMPORTANT:
+
+Only use session memory for true follow-up questions.
+
+Examples:
+
+Previous:
+Summarize PT-101
+
+Current:
+What medications is she taking?
+
+Use PT-101.
+
+Previous:
+Summarize NCT01007279
+
+Current:
+Who sponsored it?
+
+Use NCT01007279.
+
+DO NOT use session memory for discovery questions.
+
+Examples:
+
+Who was a professional athlete?
+Which patient had atrial fibrillation?
+Who had ankle swelling?
+Which patient worked as a school principal?
+
+For such questions return:
+
+{{
+    "intent": "patient",
+    "entity_type": "patient",
+    "entity_id": null,
+    "action": "retrieve",
+    "metric": null
+}}
+
 CRITICAL:
 
 Return ONLY a JSON object.
